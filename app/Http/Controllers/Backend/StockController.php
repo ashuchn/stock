@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Backend;
 
 use Validator;
 use App\Models\Stock;
+use App\Helpers\flashHelper;
+use App\Helpers\stockHelper;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -34,16 +36,21 @@ class StockController extends Controller
     {
         $valid = Validator::make($request->all(), [
             'name' => 'required',
-            'price' => 'required',
-            'total_units' => 'required'
+            'current_price' => 'required',
+            'available_units' => 'required'
         ]);
 
         if($valid->fails()) {
             return back()->withErrors($valid)->withInput($request->all());
         }
 
-        $data = Stock::create($request->all());
-        return ["message" => "ok", "data" => $data];
+        $data = stockHelper::createStock($valid->validated());
+        if($data) {
+            return redirect()->route('backend.stock.index');
+        } else {
+            return back();
+        }
+
     }
 
     /**
@@ -59,7 +66,9 @@ class StockController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $id = decrypt($id);
+        $data = Stock::find($id);
+        return view('backend.stock.edit', compact('data'));
     }
 
     /**
@@ -67,7 +76,22 @@ class StockController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $valid = Validator::make($request->all(), [
+            'name' => 'required',
+            'current_price' => 'required',
+            'available_units' => 'required'
+        ]);
+
+        if($valid->fails()) {
+            return back()->withErrors($valid)->withInput($request->all());
+        }
+
+        $data = stockHelper::updateStock($valid->validated(), decrypt($id));
+        if($data) {
+            return redirect()->route('backend.stock.index');
+        } else {
+            return back();
+        }
     }
 
     /**

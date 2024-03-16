@@ -53,12 +53,23 @@
                                             <tr>
                                                 <th>S.No</th>
                                                 <th>Stock Name</th>
-                                                <th>Total Units</th>
+                                                <th>Current Price</th>
                                                 <th>Available Units</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            
+                                            @foreach($data as $key => $rows)
+                                            <tr>
+                                                <td>{{ $key+1 }}</td>
+                                                <td>{{ $rows->name }}</td>
+                                                <td>{{ $rows->current_price }}</td>
+                                                <td>{{ $rows->available_units }}</td>
+                                                <td>
+                                                    <a href="{{ route('backend.stock.edit', ['stock' => encrypt($rows->id)]) }}" class="btn btn-sm btn-primary">Edit</a>
+                                                </td>
+                                            </tr>
+                                            @endforeach
                                         </tbody>
                                     </table>
                                 </div>
